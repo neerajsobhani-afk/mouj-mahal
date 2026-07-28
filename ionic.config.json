@@ -1,0 +1,7 @@
+{
+  "name": "mouj-mahal",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
