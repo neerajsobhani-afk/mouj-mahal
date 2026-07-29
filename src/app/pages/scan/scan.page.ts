@@ -144,18 +144,18 @@ export class ScanPage implements OnInit, OnDestroy {
         next: async (apiResponse: any) => {
           await loading.dismiss();
           
-        //   this.router.navigate(['/scan-result'], {
-        //     state: { resultData: apiResponse }
-        //   });
+          this.router.navigate(['/scan-result'], {
+            state: { resultData: apiResponse }
+          });
 
         console.log('API Response:', apiResponse);
         },
         error: async (err) => {
           await loading.dismiss();
           const errorPayload = err.error || { message: 'Failed to communicate with authorization servers.' };
-        //   this.router.navigate(['/scan-result'], {
-        //     state: { resultData: { success: false, ...errorPayload } }
-        //   });
+          this.router.navigate(['/scan-result'], {
+            state: { resultData: { success: false, ...errorPayload } }
+          });
         console.error('API Error Response:', errorPayload);
         }
       });
