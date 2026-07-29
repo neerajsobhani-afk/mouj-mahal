@@ -91,12 +91,48 @@ export class ScanPage implements OnInit {
       this.router.navigate(['/tabs/scan-result']);
     }
   }
+  async processScannedData(qrContent: string, serviceType: string, userId: any) {
+    // Show a loading overlay spinner immediately while network executes
+    const loading = await this.loadingController.create({
+      message: 'Validating Entry Scan...',
+    });
+    await loading.present();
 
-  private processScannedCode(scannedText: string) {
-    let orderId = scannedText.trim();
-    if (!orderId) {
-      this.showToast('Invalid QR Code: empty content.', 'danger');
-      return;
+    try {
+      
+      // 2. Prepare payload matching requirements exactly
+      const payload = {
+        order_id: qrContent,
+        service_type: serviceType,
+        user_id: userId
+      };
+
+      // 3. Inject Bearer authentication token from your session state wrapper
+      let headers = new HttpHeaders().set('Content-Type', 'application/json');
+      this.http.post(this.authService.baseUrl + '/entry-scan', payload, { headers }).subscribe({
+        next: async (apiResponse: any) => {
+          await loading.dismiss();
+          
+          this.router.navigate(['/scan-result'], {
+            state: { resultData: apiResponse }
+          });
+
+        console.log('API Response:', apiResponse);
+        },
+        error: async (err) => {
+          await loading.dismiss();
+          const errorPayload = err.error || { message: 'Failed to communicate with authorization servers.' };
+          this.router.navigate(['/scan-result'], {
+            state: { resultData: { success: false, ...errorPayload } }
+          });
+        console.error('API Error Response:', errorPayload);
+        }
+      });
+
+    } catch (e) {
+      await loading.dismiss();
+      this.presentAlert('Parsing Crash', 'Failed to generate runtime data stream pipelines.');
+
     }
 
     try {
