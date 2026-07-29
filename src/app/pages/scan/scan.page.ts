@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import {
@@ -7,7 +7,6 @@ import {
   IonSpinner,
   ToastController
 } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
 import {
   qrCodeOutline,
   cameraOutline,
@@ -26,6 +25,10 @@ import { AuthService } from '../../services/auth.service';
   standalone: true,
   imports: [
     CommonModule,
+    HttpClientModule,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
     IonContent,
     IonIcon,
     IonSpinner

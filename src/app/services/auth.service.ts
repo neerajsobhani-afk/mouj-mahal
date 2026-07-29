@@ -34,7 +34,7 @@ export type LoginResponse = LoginSuccessResponse | LoginErrorResponse;
 })
 export class AuthService {
   private http = inject(HttpClient);
-  private baseUrl = 'https://apiv2.moujmahal.co.in/api';
+  public baseUrl = 'https://apiv2.moujmahal.co.in/api';
 
   login(email: string, password: string): Observable<LoginResponse> {
     const url = `${this.baseUrl}/ajax_login`;

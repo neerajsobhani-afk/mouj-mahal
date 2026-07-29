@@ -28,6 +28,43 @@
         <ion-spinner name="crescent" *ngIf="isScanning || isVerifying"></ion-spinner>
         <span>{{ isScanning ? 'Scanning...' : isVerifying ? 'Verifying Order...' : 'Start QR Scanner' }}</span>
       </button>
+<!--
+<ion-header [class.ion-hide]="isScanning">
+  <ion-toolbar color="primary">
+    <ion-title>QR Code Scanner</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" [forceOverscroll]="false">
+  <div class="ion-padding ion-text-center" *ngIf="!isScanning">
+    <ion-button expand="block" (click)="startScan()">
+      <ion-icon name="qr-code-outline" slot="start"></ion-icon>
+      Start Scanning
+    </ion-button>
+
+    <ion-card *ngIf="scanResult" class="ion-margin-top">
+      <ion-card-header>
+        <ion-card-title>Scan Result</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p class="scanned-text">{{ scanResult }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+
+  <div class="scanner-ui-container" *ngIf="isScanning">
+    <div class="viewfinder-box"></div>
+    
+    <div class="scanner-buttons">
+      <ion-fab-button (click)="toggleTorch()" color="light">
+        <ion-icon [name]="isTorchOn ? 'flash-off' : 'flash'"></ion-icon>
+      </ion-fab-button>
+      
+      <ion-fab-button (click)="stopScan()" color="danger">
+        <ion-icon name="close"></ion-icon>
+      </ion-fab-button>
+-->
     </div>
 
   </div>

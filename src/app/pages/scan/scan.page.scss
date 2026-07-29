@@ -1,3 +1,4 @@
+
 .scan-content {
   --background: #fffaf7;
 }
@@ -98,32 +99,75 @@
       box-shadow: 0 0 12px #d75020;
       animation: scanLaser 2s infinite ease-in-out;
     }
-  }
+    
+// :host-context(body.barcode-scanner-active) {
+//   ion-content {
+//     --background: transparent;
+//   }
+// }
 
-  .scan-btn {
-    width: 100%;
-    height: 52px;
-    background: linear-gradient(135deg, #fe9252 0%, #d75020 100%);
-    border: none;
-    border-radius: 14px;
-    color: #ffffff;
-    font-size: 16px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    cursor: pointer;
-    box-shadow: 0 6px 20px rgba(215, 80, 32, 0.28);
-    transition: transform 0.15s ease;
+// .scanner-ui-container {
+//   position: absolute;
+//   top: 0;
+//   left: 0;
+//   width: 100%;
+//   height: 100%;
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: space-between;
+//   align-items: center;
+//   box-sizing: border-box;
+//   padding: 40px 20px;
+//   background: rgba(0, 0, 0, 0.4); // Darkened border mask around viewfinder
 
-    &:active {
-      transform: scale(0.98);
-    }
-  }
-}
+//   .viewfinder-box {
+//     width: 250px;
+//     height: 250px;
+//     margin-top: auto;
+//     margin-bottom: auto;
+//     border: 4px solid #3880ff; // Highlighting color box frame
+//     border-radius: 12px;
+//     box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4); // Darkens area outside scanner square
+//   }
 
-@keyframes scanLaser {
-  0%, 100% { top: 15%; }
-  50% { top: 85%; }
+//   .scanner-buttons {
+//     display: flex;
+//     gap: 30px;
+//     margin-bottom: 20px;
+//     z-index: 10;
+// >>>>>>> master
+//   }
+
+// <<<<<<< neeraj
+//   .scan-btn {
+//     width: 100%;
+//     height: 52px;
+//     background: linear-gradient(135deg, #fe9252 0%, #d75020 100%);
+//     border: none;
+//     border-radius: 14px;
+//     color: #ffffff;
+//     font-size: 16px;
+//     font-weight: 700;
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     gap: 10px;
+//     cursor: pointer;
+//     box-shadow: 0 6px 20px rgba(215, 80, 32, 0.28);
+//     transition: transform 0.15s ease;
+
+//     &:active {
+//       transform: scale(0.98);
+//     }
+//   }
+// }
+
+// @keyframes scanLaser {
+//   0%, 100% { top: 15%; }
+//   50% { top: 85%; }
+// =======
+// .scanned-text {
+//   font-weight: bold;
+//   word-break: break-all;
+//   color: var(--ion-color-dark);
 }
