@@ -1,0 +1,40 @@
+<ion-content [fullscreen]="true" class="profile-content">
+  <div class="profile-container">
+    
+    <!-- Profile DP & Name Section -->
+    <div class="profile-header">
+      <div class="dp-wrapper">
+        <img src="assets/logo.jpg" alt="Profile Picture" class="dp-image" />
+        <button type="button" class="dp-edit-badge" aria-label="Edit Profile Picture">
+          <ion-icon name="create-outline"></ion-icon>
+        </button>
+      </div>
+      <h2 class="user-name">{{ officerName }}</h2>
+      <p class="user-email" *ngIf="currentUser?.email">{{ currentUser?.email }}</p>
+    </div>
+
+    <!-- Main Actions Group -->
+    <div class="profile-actions">
+      
+      <!-- Change Password Option -->
+      <div class="action-card" (click)="onChangePassword()">
+        <div class="action-left">
+          <div class="action-icon-box">
+            <ion-icon name="key-outline"></ion-icon>
+          </div>
+          <span class="action-label">Change Password</span>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="action-arrow"></ion-icon>
+      </div>
+
+      <!-- Direct Log Out Button -->
+      <button type="button" class="logout-btn" (click)="onLogout()">
+        <ion-icon name="log-out-outline"></ion-icon>
+        <span>Log Out</span>
+      </button>
+
+    </div>
+
+  </div>
+</ion-content>
+

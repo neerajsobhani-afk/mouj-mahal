@@ -1,2 +1,18 @@
-// For information on how to create your own theme, please refer to:
-// https://ionicframework.com/docs/theming/
+// Theme variables for Mouj Mahal App
+:root {
+  --ion-color-primary: #d75020;
+  --ion-color-primary-rgb: 215, 80, 32;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #bd461c;
+  --ion-color-primary-tint: #db6136;
+
+  --ion-color-secondary: #fe9252;
+  --ion-color-secondary-rgb: 254, 146, 82;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #e08048;
+  --ion-color-secondary-tint: #fe9d63;
+
+  --ion-font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}

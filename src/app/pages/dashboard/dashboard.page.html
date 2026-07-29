@@ -1,0 +1,33 @@
+<ion-content [fullscreen]="true" class="dashboard-content">
+  <div class="dashboard-container">
+    
+    <!-- Top Header -->
+    <div class="header-section">
+      <div class="header-text">
+        <h1 class="page-title">Officer Dashboard</h1>
+        <p class="page-subtitle">Monitoring Fun Zone entry point Alpha-1</p>
+      </div>
+      <button type="button" class="header-notification-btn" aria-label="Notifications">
+        <ion-icon name="notifications-outline"></ion-icon>
+        <span class="notification-dot"></span>
+      </button>
+    </div>
+
+    <!-- Stats Section (Today's Entries Only) -->
+    <div class="stats-wrapper">
+      
+      <!-- Card 1: Today's Entries (Full Width) -->
+      <div class="stat-card full-card">
+        <div class="card-left">
+          <span class="card-label">Today's Entries</span>
+          <h2 class="card-value main-value">{{ todayEntries }}</h2>
+        </div>
+        <div class="card-badge primary-badge">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</ion-content>

@@ -1,0 +1,68 @@
+<ion-content [fullscreen]="true" class="scan-content">
+  <div class="scan-container">
+
+    <!-- Top Scanner Title -->
+    <div class="scan-header">
+      <h1 class="scan-title">Scan QR Ticket</h1>
+      <p class="scan-subtitle">Align ticket QR code inside the frame to verify entry</p>
+    </div>
+
+    <!-- Viewfinder Area -->
+    <div class="viewfinder-wrapper">
+      <div class="viewfinder-box" [class.flash-active]="flashOn">
+
+        <!-- Corner Markers -->
+        <span class="corner top-left"></span>
+        <span class="corner top-right"></span>
+        <span class="corner bottom-left"></span>
+        <span class="corner bottom-right"></span>
+
+        <!-- Animated Scan Line -->
+        <div class="scan-laser" *ngIf="!scanResult"></div>
+
+        <!-- Camera Center Icon / Result Overlay -->
+        <div class="scanner-center" *ngIf="!scanResult">
+          <ion-icon name="qr-code-outline" class="center-qr-icon"></ion-icon>
+        </div>
+
+        <div class="result-overlay" *ngIf="scanResult" [class.success]="scanResult.valid"
+          [class.danger]="!scanResult.valid">
+          <ion-icon [name]="scanResult.valid ? 'checkmark-circle-outline' : 'alert-circle-outline'"
+            class="result-icon"></ion-icon>
+          <h3 class="result-ticket">{{ scanResult.ticket }}</h3>
+          <p class="result-msg">{{ scanResult.message }}</p>
+          <button type="button" class="rescan-btn" (click)="resetScan()">
+            <ion-icon name="refresh-outline"></ion-icon> Scan Another
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Flash & Trigger Controls -->
+      <div class="scanner-controls">
+        <button type="button" class="control-btn" (click)="toggleFlash()" [class.active]="flashOn">
+          <ion-icon [name]="flashOn ? 'flash-outline' : 'flash-off-outline'"></ion-icon>
+          <span>Flash</span>
+        </button>
+
+        <button type="button" class="trigger-scan-btn" (click)="simulateScan()" [disabled]="isVerifying">
+          <ion-spinner *ngIf="isVerifying" name="crescent"></ion-spinner>
+          <span *ngIf="!isVerifying">Tap to Scan</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Manual Code Entry Option -->
+    <div class="manual-entry-card">
+      <label class="manual-label">Or enter ticket code manually</label>
+      <div class="manual-input-box">
+        <input type="text" [(ngModel)]="manualTicket" placeholder="e.g. TKT-8921-AZ" class="manual-input" />
+        <button type="button" class="manual-submit-btn" (click)="simulateScan()" [disabled]="!manualTicket.trim()">
+          <ion-icon name="arrow-forward-outline"></ion-icon>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</ion-content>

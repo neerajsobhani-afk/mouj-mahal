@@ -1,0 +1,84 @@
+<ion-content [fullscreen]="true" class="login-content">
+  <div class="login-container">
+    
+    <!-- Outer Brand Header -->
+    <div class="brand-header">
+      <div class="logo-wrapper">
+        <img src="assets/logo.jpg" alt="Mouj Mahal Logo" class="brand-logo" />
+      </div>
+    </div>
+
+    <!-- Main Login Card -->
+    <div class="login-card">
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
+        
+        <!-- Email / Username Field Group -->
+        <div class="form-group" [class.has-error]="f['email'].invalid && (f['email'].touched || submitted)">
+          <div class="label-row">
+            <label for="emailInput" class="field-label">Username / Email</label>
+          </div>
+          <div class="input-box">
+            <ion-icon name="person-outline" class="input-left-icon"></ion-icon>
+            <input
+              id="emailInput"
+              type="email"
+              formControlName="email"
+              placeholder="Enter registered email"
+              autocomplete="email"
+              class="custom-input"
+            />
+          </div>
+          <div class="error-msg" *ngIf="f['email'].invalid && (f['email'].touched || submitted)">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+            <span *ngIf="f['email'].errors?.['required']">Email / Username is required</span>
+          </div>
+        </div>
+
+        <!-- Password Field Group -->
+        <div class="form-group" [class.has-error]="f['password'].invalid && (f['password'].touched || submitted)">
+          <div class="label-row">
+            <label for="passwordInput" class="field-label">Password</label>
+            <button type="button" class="forgot-link" (click)="onForgotPassword()">Forgot Password?</button>
+          </div>
+          <div class="input-box">
+            <ion-icon name="lock-closed-outline" class="input-left-icon"></ion-icon>
+            <input
+              id="passwordInput"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Enter secure password"
+              autocomplete="current-password"
+              class="custom-input"
+            />
+            <button type="button" class="eye-toggle-btn" (click)="togglePasswordVisibility()" aria-label="Toggle password visibility">
+              <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+            </button>
+          </div>
+          <div class="error-msg" *ngIf="f['password'].invalid && (f['password'].touched || submitted)">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+            <span *ngIf="f['password'].errors?.['required']">Password is required</span>
+            <span *ngIf="f['password'].errors?.['minlength']">Password must be at least 6 characters</span>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="action-group">
+          <button type="submit" class="login-submit-btn" [disabled]="isSubmitting">
+            <span *ngIf="!isSubmitting" class="btn-content">
+              Login
+              <ion-icon name="arrow-forward-outline" class="btn-icon"></ion-icon>
+            </span>
+            <ion-spinner *ngIf="isSubmitting" name="crescent" class="btn-spinner"></ion-spinner>
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Footer Copyright Note -->
+    <div class="login-footer">
+      <p class="copyright-text">© 2026 Mouj Mahal • The Paradise of Fun</p>
+    </div>
+
+  </div>
+</ion-content>

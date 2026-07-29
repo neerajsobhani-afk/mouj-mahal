@@ -1,0 +1,171 @@
+.profile-content {
+  --background: #f8fafc;
+}
+
+.profile-container {
+  padding: calc(40px + env(safe-area-inset-top, 0px)) 24px calc(32px + env(safe-area-inset-bottom, 0px));
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Profile DP & Name Section */
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 36px;
+  text-align: center;
+
+  .dp-wrapper {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin-bottom: 18px;
+
+    .dp-image {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #ffffff;
+      box-shadow: 0 10px 25px rgba(215, 80, 32, 0.25);
+    }
+
+    .dp-edit-badge {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #d75020;
+      border: 3px solid #ffffff;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      box-shadow: 0 4px 10px rgba(215, 80, 32, 0.35);
+      cursor: pointer;
+      padding: 0;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+
+      &:active {
+        transform: scale(0.92);
+        background: #fe9252;
+      }
+    }
+  }
+
+  .user-name {
+    font-size: 24px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 6px 0;
+    letter-spacing: -0.3px;
+  }
+
+  .user-email {
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+    margin: 0;
+  }
+}
+
+/* Profile Actions Section */
+.profile-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  /* Change Password Option */
+  .action-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover, &:active {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(215, 80, 32, 0.08);
+      border-color: rgba(215, 80, 32, 0.2);
+
+      .action-arrow {
+        color: #d75020;
+        transform: translateX(2px);
+      }
+    }
+
+    .action-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+
+      .action-icon-box {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: #fff3ec;
+        color: #d75020;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+      }
+
+      .action-label {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1e293b;
+      }
+    }
+
+    .action-arrow {
+      font-size: 20px;
+      color: #94a3b8;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+  }
+
+  /* Direct Logout Button */
+  .logout-btn {
+    width: 100%;
+    height: 54px;
+    border-radius: 18px;
+    border: none;
+    background: #fee2e2;
+    color: #dc2626;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.2s ease;
+
+    ion-icon {
+      font-size: 22px;
+    }
+
+    &:hover, &:active {
+      background: #fca5a5;
+      color: #b91c1c;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(220, 38, 38, 0.18);
+    }
+  }
+}
+
