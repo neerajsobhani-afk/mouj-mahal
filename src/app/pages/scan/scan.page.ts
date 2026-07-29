@@ -1,23 +1,32 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import {
-  IonContent,
-  IonIcon
+import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
+import { Router } from '@angular/router'; // Injected for page redirection
+import { 
+  IonHeader, 
+  IonToolbar, 
+  IonTitle, 
+  IonContent, 
+  IonButton, 
+  IonIcon, 
+  IonCard, 
+  IonCardHeader, 
+  IonCardTitle, 
+  IonCardContent, 
+  IonFabButton,
+  AlertController,
+  LoadingController 
 } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
 import {
-  qrCodeOutline,
-  cameraOutline,
-  checkmarkCircleOutline,
-  alertCircleOutline,
-  closeCircleOutline,
-  shieldCheckmarkOutline,
-  warningOutline,
-  locationOutline,
-  arrowBackOutline
-} from 'ionicons/icons';
-import { AuthService } from '../../services/auth.service';
+  BarcodeScanner,
+  BarcodeFormat,
+  LensFacing,
+} from '@capacitor-mlkit/barcode-scanning';
+import { Torch } from '@capawesome/capacitor-torch';
+
+import { addIcons } from 'ionicons';
+import { qrCodeOutline, flash, flashOff, close } from 'ionicons/icons';
+import { AuthService } from '../../services/auth.service'; // Adjust path to your auth service
 
 @Component({
   selector: 'app-scan',
@@ -26,88 +35,170 @@ import { AuthService } from '../../services/auth.service';
   standalone: true,
   imports: [
     CommonModule,
+    HttpClientModule,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
     IonContent,
-    IonIcon
+    IonButton,
+    IonIcon,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
+    IonFabButton
   ]
 })
-export class ScanPage implements OnInit {
+export class ScanPage implements OnInit, OnDestroy {
+  private http = inject(HttpClient);
   private router = inject(Router);
-  private authService = inject(AuthService);
+  private alertController = inject(AlertController);
+  private loadingController = inject(LoadingController);
+  private authService = inject(AuthService); // Used to pull your active session token
 
-  /**
-   * API Response Message Variable.
-   * Change this value manually in code or select from the top dropdown to test different pages:
-   * - 'Entry allowed.'   => Variation 1 (200 OK — Entry Allowed)
-   * - 'Invalid order.'   => Variation 2 (404 Not Found — Invalid Order)
-   * - 'Already entered.' => Variation 3 (409 Conflict — Already Scanned)
-   */
-  apiMessage: string = 'Entry allowed.';
-
-  // Response Payload Mock Data
-  allowedData = {
-    customerName: 'Alexander Sterling',
-    ticketNumber: '#SZ-992-FX01',
-    type: 'Fun Zone',
-    time: '14:45 PM',
-    gateName: 'North Gate B',
-    status: 'Active',
-    location: 'Fun Zone Entrance'
-  };
-
-  invalidData = {
-    title: 'Invalid QR Code',
-    message: 'This ticket is not found in the system.',
-    auditSyncTime: '2 minutes ago'
-  };
-
-  alreadyEnteredData = {
-    customerName: 'Marcus Holloway',
-    badgeType: 'VIP PASS',
-    ticketNumber: '#ENTRY-88291-FZ',
-    previousEntry: '14:22 PM',
-    lastSeenAt: 'North Plaza - Gate 4',
-    warningMessage: 'Potential duplicate entry attempt detected. Deny access and verify ID if necessary.'
-  };
+  scanResult: string | null = null;
+  isScanning: boolean = false;
+  isTorchOn: boolean = false;
+  service_type: any  = localStorage.getItem('service_type');
+  user_id: any;
 
   constructor() {
     addIcons({
-      qrCodeOutline,
-      cameraOutline,
-      checkmarkCircleOutline,
-      alertCircleOutline,
-      closeCircleOutline,
-      shieldCheckmarkOutline,
-      warningOutline,
-      locationOutline,
-      arrowBackOutline
+      'qr-code-outline': qrCodeOutline,
+      'flash': flash,
+      'flash-off': flashOff,
+      'close': close
     });
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    const currentUser = localStorage.getItem('currentUser') ? JSON.parse(localStorage.getItem('currentUser')!) : null;
+    if (currentUser) {
+      this.user_id = currentUser.id;
+      console.log('User ID:', this.user_id);
+    } else {
+      this.router.navigate(['/login']);
+    }
+    BarcodeScanner.isSupported().then((result) => {
+      if (!result.supported) {
+        this.presentAlert('Framework Warning', 'Barcode scanning is not supported on this platform view.');
+      }
+    });
+  }
 
-  onMessageChange(event: Event) {
-    const target = event.target as HTMLSelectElement;
-    if (target) {
-      this.apiMessage = target.value;
+  async startScan() {
+    try {
+      const permission = await BarcodeScanner.requestPermissions();
+      if (permission.camera !== 'granted') {
+        this.presentAlert('Permission Denied', 'Camera access is required.');
+        return;
+      }
+
+      this.scanResult = null;
+      this.isScanning = true;
+      document.querySelector('body')?.classList.add('barcode-scanner-active');
+
+      await BarcodeScanner.addListener(
+        'barcodesScanned',
+        async (event) => {
+          if (event && event.barcodes && event.barcodes.length > 0) {
+            const rawValue = event.barcodes[0].displayValue;
+            this.scanResult = rawValue;
+            
+            this.stopScan();
+            this.processScannedData(rawValue, this.service_type, this.user_id);
+          }
+        }
+      );
+
+      await BarcodeScanner.startScan({
+        formats: [BarcodeFormat.QrCode],
+        lensFacing: LensFacing.Back
+      });
+
+    } catch (error: any) {
+      console.error('Scan Runtime Breakdown Event:', error);
+      this.stopScan();
     }
   }
 
-  /**
-   * Evaluates apiMessage variable and returns page response type:
-   * 'allowed' | 'invalid' | 'already_entered'
-   */
-  get responseType(): 'allowed' | 'invalid' | 'already_entered' {
-    const msg = (this.apiMessage || '').trim().toLowerCase();
-    if (msg.includes('already') || msg.includes('409')) {
-      return 'already_entered';
+  async processScannedData(qrContent: string, serviceType: string, userId: any) {
+    // Show a loading overlay spinner immediately while network executes
+    const loading = await this.loadingController.create({
+      message: 'Validating Entry Scan...',
+    });
+    await loading.present();
+
+    try {
+      
+      // 2. Prepare payload matching requirements exactly
+      const payload = {
+        order_id: qrContent,
+        service_type: serviceType,
+        user_id: userId
+      };
+
+      // 3. Inject Bearer authentication token from your session state wrapper
+      let headers = new HttpHeaders().set('Content-Type', 'application/json');
+      this.http.post(this.authService.baseUrl + '/entry-scan', payload, { headers }).subscribe({
+        next: async (apiResponse: any) => {
+          await loading.dismiss();
+          
+        //   this.router.navigate(['/scan-result'], {
+        //     state: { resultData: apiResponse }
+        //   });
+
+        console.log('API Response:', apiResponse);
+        },
+        error: async (err) => {
+          await loading.dismiss();
+          const errorPayload = err.error || { message: 'Failed to communicate with authorization servers.' };
+        //   this.router.navigate(['/scan-result'], {
+        //     state: { resultData: { success: false, ...errorPayload } }
+        //   });
+        console.error('API Error Response:', errorPayload);
+        }
+      });
+
+    } catch (e) {
+      await loading.dismiss();
+      this.presentAlert('Parsing Crash', 'Failed to generate runtime data stream pipelines.');
     }
-    if (msg.includes('invalid') || msg.includes('not found') || msg.includes('404')) {
-      return 'invalid';
-    }
-    return 'allowed';
   }
 
-  onScanNext() {
-    this.router.navigate(['/tabs/dashboard']);
+  async toggleTorch() {
+    try {
+      if (this.isTorchOn) {
+        await Torch.disable();
+        this.isTorchOn = false;
+      } else {
+        await Torch.enable();
+        this.isTorchOn = true;
+      }
+    } catch (error) {
+      this.presentAlert('Torch Error', 'Flashlight could not be toggled.');
+    }
+  }
+
+  async stopScan() {
+    this.isScanning = false;
+    this.isTorchOn = false;
+    await BarcodeScanner.removeAllListeners();
+    await BarcodeScanner.stopScan();
+    await Torch.disable(); 
+    document.querySelector('body')?.classList.remove('barcode-scanner-active');
+  }
+
+  async presentAlert(header: string, message: string) {
+    const alert = await this.alertController.create({
+      header,
+      message,
+      buttons: ['OK'],
+    });
+    await alert.present();
+  }
+
+  ngOnDestroy() {
+    this.stopScan();
   }
 }
