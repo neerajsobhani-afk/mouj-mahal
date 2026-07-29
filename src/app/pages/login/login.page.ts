@@ -95,6 +95,8 @@ export class LoginPage implements OnInit {
 
         if (res.success) {
           this.authService.saveUser(res.data);
+          const role = res.data.role || res.data.serviceType || res.data.service_type || res.data.user_type || 'Ticket Manager';
+          this.authService.saveServiceType(role);
 
           const toast = await this.toastCtrl.create({
             message: `Welcome back, ${res.data.name || res.data.firstName || 'User'}!`,
