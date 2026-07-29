@@ -1,3 +1,34 @@
+<ion-content [fullscreen]="true" class="scan-content">
+  <div class="scan-container">
+
+    <!-- Top Scanner Title -->
+    <div class="scan-header">
+      <h1 class="scan-title">QR Ticket Scanner</h1>
+      <p class="scan-subtitle">Scan ticket or parking QR code to get Order ID</p>
+    </div>
+
+    <!-- Active Scanner Frame -->
+    <div class="scanner-card">
+      <div class="scanner-viewfinder">
+        <span class="corner top-left"></span>
+        <span class="corner top-right"></span>
+        <span class="corner bottom-left"></span>
+        <span class="corner bottom-right"></span>
+
+        <div class="scan-laser" *ngIf="isScanning"></div>
+
+        <div class="center-content">
+          <ion-icon name="qr-code-outline" class="qr-icon"></ion-icon>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <button type="button" class="scan-btn" (click)="startScan()" [disabled]="isScanning || isVerifying">
+        <ion-icon name="camera-outline" *ngIf="!isScanning && !isVerifying"></ion-icon>
+        <ion-spinner name="crescent" *ngIf="isScanning || isVerifying"></ion-spinner>
+        <span>{{ isScanning ? 'Scanning...' : isVerifying ? 'Verifying Order...' : 'Start QR Scanner' }}</span>
+      </button>
+<!--
 <ion-header [class.ion-hide]="isScanning">
   <ion-toolbar color="primary">
     <ion-title>QR Code Scanner</ion-title>
@@ -5,7 +36,6 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" [forceOverscroll]="false">
-  <!-- Standard Landing UI (Hidden while camera layer active) -->
   <div class="ion-padding ion-text-center" *ngIf="!isScanning">
     <ion-button expand="block" (click)="startScan()">
       <ion-icon name="qr-code-outline" slot="start"></ion-icon>
@@ -22,7 +52,7 @@
     </ion-card>
   </div>
 
-  <!-- Native Active Camera Overlay Window -->
+
   <div class="scanner-ui-container" *ngIf="isScanning">
     <div class="viewfinder-box"></div>
     
@@ -34,6 +64,7 @@
       <ion-fab-button (click)="stopScan()" color="danger">
         <ion-icon name="close"></ion-icon>
       </ion-fab-button>
+-->
     </div>
 
   </div>
