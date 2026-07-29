@@ -106,20 +106,11 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
+      justify-content: center;
 
       .qr-icon {
         font-size: 72px;
         color: rgba(255, 255, 255, 0.85);
-      }
-
-      .role-badge {
-        font-size: 11.5px;
-        font-weight: 600;
-        color: #fe9252;
-        background: rgba(254, 146, 82, 0.15);
-        padding: 4px 10px;
-        border-radius: 12px;
       }
     }
   }
