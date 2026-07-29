@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import {
   IonContent,
   IonIcon,
@@ -10,7 +11,8 @@ import {
   personOutline,
   checkmarkCircleOutline,
   notificationsOutline,
-  refreshOutline
+  refreshOutline,
+  documentTextOutline
 } from 'ionicons/icons';
 import { AuthService } from '../../services/auth.service';
 
@@ -28,6 +30,7 @@ import { AuthService } from '../../services/auth.service';
 })
 export class DashboardPage implements OnInit {
   private authService = inject(AuthService);
+  private router = inject(Router);
 
   todayEntries: number | null = null;
   isLoading = false;
@@ -37,7 +40,8 @@ export class DashboardPage implements OnInit {
       personOutline,
       checkmarkCircleOutline,
       notificationsOutline,
-      refreshOutline
+      refreshOutline,
+      documentTextOutline
     });
   }
 
@@ -47,6 +51,10 @@ export class DashboardPage implements OnInit {
 
   ionViewWillEnter() {
     this.loadDashboardStats();
+  }
+
+  openScanResult() {
+    this.router.navigate(['/tabs/scan-result']);
   }
 
   loadDashboardStats() {

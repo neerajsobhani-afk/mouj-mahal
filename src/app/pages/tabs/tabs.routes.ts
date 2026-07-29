@@ -17,6 +17,11 @@ export const routes: Routes = [
           import('../scan/scan.page').then((m) => m.ScanPage),
       },
       {
+        path: 'scan-result',
+        loadComponent: () =>
+          import('../scan-result/scan-result.page').then((m) => m.ScanResultPage),
+      },
+      {
         path: 'profile',
         loadComponent: () =>
           import('../profile/profile.page').then((m) => m.ProfilePage),

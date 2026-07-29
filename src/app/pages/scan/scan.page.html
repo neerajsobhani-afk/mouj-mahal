@@ -1,185 +1,33 @@
-<ion-content [fullscreen]="true" class="scan-page-content">
-  <div class="result-container">
-    
-    <!-- Top Bar: SafeEntry Guard Brand + Navigation -->
-    <div class="result-top-bar">
-      <div class="brand-info">
-        <div class="brand-avatar">
-          <ion-icon name="shield-checkmark-outline"></ion-icon>
-        </div>
-        <span class="brand-name">SafeEntry Guard</span>
-      </div>
+<ion-content [fullscreen]="true" class="scan-content">
+  <div class="scan-container">
+
+    <!-- Top Scanner Title -->
+    <div class="scan-header">
+      <h1 class="scan-title">QR Ticket Scanner</h1>
+      <p class="scan-subtitle">Scan ticket or parking QR code to get Order ID</p>
     </div>
 
+    <!-- Active Scanner Frame -->
+    <div class="scanner-card">
+      <div class="scanner-viewfinder">
+        <span class="corner top-left"></span>
+        <span class="corner top-right"></span>
+        <span class="corner bottom-left"></span>
+        <span class="corner bottom-right"></span>
 
+        <div class="scan-laser" *ngIf="isScanning"></div>
 
-    <!-- ============================================== -->
-    <!-- VARIATION 1: ENTRY ALLOWED ("Entry allowed.") -->
-    <!-- ============================================== -->
-    <div class="variation-wrapper allowed-variation" *ngIf="responseType === 'allowed'">
-      
-      <div class="ticket-card">
-        
-        <!-- Header row -->
-        <div class="card-header-row">
-          <div class="customer-block">
-            <span class="field-label">CUSTOMER NAME</span>
-            <h2 class="customer-name">{{ allowedData.customerName }}</h2>
-          </div>
-          <span class="status-pill active-pill">Active</span>
-        </div>
-
-        <!-- Details Grid -->
-        <div class="details-grid">
-          <div class="grid-item">
-            <span class="field-label">TICKET NUMBER</span>
-            <span class="field-value">{{ allowedData.ticketNumber }}</span>
-          </div>
-          <div class="grid-item">
-            <span class="field-label">TYPE</span>
-            <span class="field-value type-highlight">{{ allowedData.type }}</span>
-          </div>
-          <div class="grid-item">
-            <span class="field-label">TIME</span>
-            <span class="field-value">{{ allowedData.time }}</span>
-          </div>
-          <div class="grid-item">
-            <span class="field-label">GATE NAME</span>
-            <span class="field-value">{{ allowedData.gateName }}</span>
-          </div>
-        </div>
-
-        <!-- Dotted Cutout Separator -->
-        <div class="ticket-separator">
-          <div class="notch left-notch"></div>
-          <div class="dashed-line"></div>
-          <div class="notch right-notch"></div>
-        </div>
-
-        <!-- Image Container -->
-        <div class="location-image-box">
-          <img src="assets/fun_zone_entrance.png" alt="Fun Zone Entrance" class="location-img" />
-          <div class="location-badge">
-            <ion-icon name="location-outline"></ion-icon>
-            <span>{{ allowedData.location }}</span>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Action Button -->
-      <button type="button" class="primary-action-btn" (click)="onScanNext()">
-        <ion-icon name="qr-code-outline"></ion-icon>
-        <span>Scan Next Ticket</span>
-      </button>
-
-    </div>
-
-
-    <!-- ============================================== -->
-    <!-- VARIATION 2: INVALID QR CODE ("Invalid order.") -->
-    <!-- ============================================== -->
-    <div class="variation-wrapper invalid-variation" *ngIf="responseType === 'invalid'">
-      
-      <!-- Amber Circle Icon -->
-      <div class="status-icon-circle amber-circle">
-        <div class="inner-warning-dot">!</div>
-      </div>
-
-      <!-- Message -->
-      <h2 class="status-title">{{ invalidData.title }}</h2>
-      <p class="status-subtitle">{{ invalidData.message }}</p>
-
-      <!-- Action Buttons -->
-      <div class="button-stack">
-        <button type="button" class="primary-action-btn" (click)="onScanNext()">
-          <ion-icon name="qr-code-outline"></ion-icon>
-          <span>Scan Again</span>
-        </button>
-        <button type="button" class="secondary-action-btn" (click)="onScanNext()">
-          <span>Back</span>
-        </button>
-      </div>
-
-      <!-- System Audit Card -->
-      <div class="audit-card">
-        <div class="audit-icon-box">
-          <ion-icon name="alert-circle-outline"></ion-icon>
-        </div>
-        <div class="audit-text">
-          <h4 class="audit-title">System Audit</h4>
-          <p class="audit-desc">
-            The entry database was last synced {{ invalidData.auditSyncTime }}. If this is a new ticket, please wait a moment or check manual lookup.
-          </p>
-        </div>
-      </div>
-
-    </div>
-
-
-    <!-- ============================================== -->
-    <!-- VARIATION 3: ALREADY ENTERED ("Already entered.") -->
-    <!-- ============================================== -->
-    <div class="variation-wrapper conflict-variation" *ngIf="responseType === 'already_entered'">
-      
-      <!-- Big Red Cross Circle Icon -->
-      <div class="status-icon-circle red-circle">
-        <ion-icon name="close-circle-outline"></ion-icon>
-      </div>
-
-      <!-- Message -->
-      <h2 class="status-title danger-title">Already Entered</h2>
-      <p class="status-subtitle">This ticket has already been processed at a gate.</p>
-
-      <!-- Details Card -->
-      <div class="ticket-card conflict-card">
-        <div class="card-header-row">
-          <div class="customer-block">
-            <span class="field-label">TICKET HOLDER</span>
-            <h2 class="customer-name">{{ alreadyEnteredData.customerName }}</h2>
-          </div>
-          <span class="status-pill vip-pill">{{ alreadyEnteredData.badgeType }}</span>
-        </div>
-
-        <div class="card-divider"></div>
-
-        <div class="details-grid two-col">
-          <div class="grid-item">
-            <span class="field-label">Ticket Number</span>
-            <span class="field-value dark-bold">{{ alreadyEnteredData.ticketNumber }}</span>
-          </div>
-          <div class="grid-item">
-            <span class="field-label">Previous Entry</span>
-            <span class="field-value dark-bold">{{ alreadyEnteredData.previousEntry }}</span>
-          </div>
-        </div>
-
-        <div class="last-seen-row">
-          <ion-icon name="location-outline"></ion-icon>
-          <div class="last-seen-text">
-            <span class="field-label">Last Seen At</span>
-            <span class="field-value dark-bold">{{ alreadyEnteredData.lastSeenAt }}</span>
-          </div>
-        </div>
-
-        <!-- Warning Alert Container -->
-        <div class="warning-alert-box">
-          <ion-icon name="warning-outline" class="alert-icon"></ion-icon>
-          <span class="alert-text">{{ alreadyEnteredData.warningMessage }}</span>
+        <div class="center-content">
+          <ion-icon name="qr-code-outline" class="qr-icon"></ion-icon>
         </div>
       </div>
 
       <!-- Action Button -->
-      <button type="button" class="primary-action-btn" (click)="onScanNext()">
-        <ion-icon name="qr-code-outline"></ion-icon>
-        <span>Scan Next</span>
+      <button type="button" class="scan-btn" (click)="startScan()" [disabled]="isScanning || isVerifying">
+        <ion-icon name="camera-outline" *ngIf="!isScanning && !isVerifying"></ion-icon>
+        <ion-spinner name="crescent" *ngIf="isScanning || isVerifying"></ion-spinner>
+        <span>{{ isScanning ? 'Scanning...' : isVerifying ? 'Verifying Order...' : 'Start QR Scanner' }}</span>
       </button>
-
-      <!-- Incident Link -->
-      <button type="button" class="link-btn" (click)="onScanNext()">
-        Report Incident
-      </button>
-
     </div>
 
   </div>

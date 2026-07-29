@@ -3,7 +3,9 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import {
   IonContent,
-  IonIcon
+  IonIcon,
+  IonSpinner,
+  ToastController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -11,12 +13,10 @@ import {
   cameraOutline,
   checkmarkCircleOutline,
   alertCircleOutline,
-  closeCircleOutline,
   shieldCheckmarkOutline,
-  warningOutline,
-  locationOutline,
-  arrowBackOutline
+  keyOutline
 } from 'ionicons/icons';
+import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -27,47 +27,19 @@ import { AuthService } from '../../services/auth.service';
   imports: [
     CommonModule,
     IonContent,
-    IonIcon
+    IonIcon,
+    IonSpinner
   ]
 })
 export class ScanPage implements OnInit {
+  private toastCtrl = inject(ToastController);
   private router = inject(Router);
   private authService = inject(AuthService);
 
-  /**
-   * API Response Message Variable.
-   * Change this value manually in code or select from the top dropdown to test different pages:
-   * - 'Entry allowed.'   => Variation 1 (200 OK — Entry Allowed)
-   * - 'Invalid order.'   => Variation 2 (404 Not Found — Invalid Order)
-   * - 'Already entered.' => Variation 3 (409 Conflict — Already Scanned)
-   */
-  apiMessage: string = 'Entry allowed.';
-
-  // Response Payload Mock Data
-  allowedData = {
-    customerName: 'Alexander Sterling',
-    ticketNumber: '#SZ-992-FX01',
-    type: 'Fun Zone',
-    time: '14:45 PM',
-    gateName: 'North Gate B',
-    status: 'Active',
-    location: 'Fun Zone Entrance'
-  };
-
-  invalidData = {
-    title: 'Invalid QR Code',
-    message: 'This ticket is not found in the system.',
-    auditSyncTime: '2 minutes ago'
-  };
-
-  alreadyEnteredData = {
-    customerName: 'Marcus Holloway',
-    badgeType: 'VIP PASS',
-    ticketNumber: '#ENTRY-88291-FZ',
-    previousEntry: '14:22 PM',
-    lastSeenAt: 'North Plaza - Gate 4',
-    warningMessage: 'Potential duplicate entry attempt detected. Deny access and verify ID if necessary.'
-  };
+  isScanning = false;
+  isVerifying = false;
+  lastScannedOrderId = '';
+  serviceType = '';
 
   constructor() {
     addIcons({
@@ -75,39 +47,92 @@ export class ScanPage implements OnInit {
       cameraOutline,
       checkmarkCircleOutline,
       alertCircleOutline,
-      closeCircleOutline,
       shieldCheckmarkOutline,
-      warningOutline,
-      locationOutline,
-      arrowBackOutline
+      keyOutline
     });
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.serviceType = this.authService.getServiceType() || 'entry';
+  }
 
-  onMessageChange(event: Event) {
-    const target = event.target as HTMLSelectElement;
-    if (target) {
-      this.apiMessage = target.value;
+  async startScan() {
+    try {
+      const { supported } = await BarcodeScanner.isSupported().catch(() => ({ supported: false }));
+
+      if (!supported) {
+        await this.showToast('Opening scan result page...', 'dark');
+        this.router.navigate(['/tabs/scan-result']);
+        return;
+      }
+
+      const { camera } = await BarcodeScanner.requestPermissions();
+      if (camera !== 'granted' && camera !== 'limited') {
+        await this.showToast('Camera permission is required to scan QR codes.', 'warning');
+        return;
+      }
+
+      this.isScanning = true;
+      const result = await BarcodeScanner.scan();
+      this.isScanning = false;
+
+      if (result.barcodes && result.barcodes.length > 0) {
+        const rawVal = result.barcodes[0].displayValue || result.barcodes[0].rawValue || '';
+        this.processScannedCode(rawVal);
+      } else {
+        await this.showToast('No QR code detected. Please try again.', 'warning');
+      }
+    } catch (err: any) {
+      this.isScanning = false;
+      console.warn('BarcodeScanner error:', err);
+      this.router.navigate(['/tabs/scan-result']);
     }
   }
 
-  /**
-   * Evaluates apiMessage variable and returns page response type:
-   * 'allowed' | 'invalid' | 'already_entered'
-   */
-  get responseType(): 'allowed' | 'invalid' | 'already_entered' {
-    const msg = (this.apiMessage || '').trim().toLowerCase();
-    if (msg.includes('already') || msg.includes('409')) {
-      return 'already_entered';
+  private processScannedCode(scannedText: string) {
+    let orderId = scannedText.trim();
+    if (!orderId) {
+      this.showToast('Invalid QR Code: empty content.', 'danger');
+      return;
     }
-    if (msg.includes('invalid') || msg.includes('not found') || msg.includes('404')) {
-      return 'invalid';
+
+    try {
+      const parsed = JSON.parse(scannedText);
+      if (parsed && (parsed.orderId || parsed.order_id || parsed.id)) {
+        orderId = parsed.orderId || parsed.order_id || parsed.id;
+      }
+    } catch (_) {
+      // String is direct Order ID
     }
-    return 'allowed';
+
+    this.lastScannedOrderId = orderId;
+    this.verifyAndProcessOrder(orderId);
   }
 
-  onScanNext() {
-    this.router.navigate(['/tabs/dashboard']);
+  async verifyAndProcessOrder(orderId: string) {
+    const role = (this.authService.getServiceType() || localStorage.getItem('serviceType') || 'entry').trim();
+
+    this.isVerifying = true;
+
+    this.authService.verifyOrder(orderId, role).subscribe({
+      next: (res) => {
+        this.isVerifying = false;
+        this.router.navigate(['/tabs/scan-result']);
+      },
+      error: (_err) => {
+        this.isVerifying = false;
+        this.router.navigate(['/tabs/scan-result']);
+      }
+    });
+  }
+
+  private async showToast(message: string, color: 'success' | 'warning' | 'danger' | 'dark') {
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 2500,
+      position: 'top',
+      color
+    });
+    await toast.present();
   }
 }

@@ -20,6 +20,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'scan-result',
+    redirectTo: 'tabs/scan-result',
+    pathMatch: 'full',
+  },
+  {
     path: 'home',
     redirectTo: 'tabs/dashboard',
     pathMatch: 'full',
@@ -28,4 +33,5 @@ export const routes: Routes = [
     path: '**',
     redirectTo: 'login',
   },
+ 
 ];
