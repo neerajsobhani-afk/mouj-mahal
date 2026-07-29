@@ -23,6 +23,15 @@
         </div>
         <ion-icon name="chevron-forward-outline" class="action-arrow"></ion-icon>
       </div>
+      <div class="action-card">
+        <div class="action-left">
+          <div class="action-icon-box">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+          </div>
+          <span class="action-label">App Version</span>
+        </div>
+        <span class="action-value">{{ appVersion }}</span>
+      </div>
 
       <!-- Direct Log Out Button -->
       <button type="button" class="logout-btn" (click)="onLogout()">

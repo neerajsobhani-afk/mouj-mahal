@@ -47,6 +47,7 @@ export class LoginPage implements OnInit {
   showPassword = false;
   isSubmitting = false;
   submitted = false;
+  role: any;
 
   constructor() {
     addIcons({
@@ -102,7 +103,14 @@ export class LoginPage implements OnInit {
             color: 'success',
             icon: 'checkmark-circle-outline'
           });
+          this.role=res.data.role;
           await toast.present();
+          if(this.role === 'Parking Manager'){
+            localStorage.setItem('service_type', 'parking');
+          }
+          else if(this.role === 'Ticket Manager'){
+            localStorage.setItem('service_type', 'entry');
+          }
 
           this.router.navigate(['/tabs/dashboard']);
         } else {
@@ -131,53 +139,4 @@ export class LoginPage implements OnInit {
     });
   }
 
-  async onForgotPassword() {
-    const alert = await this.alertCtrl.create({
-      header: 'Reset Password',
-      subHeader: 'Enter your registered email address',
-      inputs: [
-        {
-          name: 'identity',
-          type: 'text',
-          placeholder: 'Registered Email',
-          value: this.loginForm.get('email')?.value || ''
-        }
-      ],
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'alert-button-cancel'
-        },
-        {
-          text: 'Send Reset Link',
-          cssClass: 'alert-button-confirm',
-          handler: async (data) => {
-            if (!data.identity || data.identity.trim() === '') {
-              const toast = await this.toastCtrl.create({
-                message: 'Please enter a valid email address.',
-                duration: 2000,
-                color: 'warning',
-                position: 'bottom'
-              });
-              await toast.present();
-              return false;
-            }
-
-            const toast = await this.toastCtrl.create({
-              message: `Password reset instructions sent to ${data.identity}`,
-              duration: 3000,
-              color: 'primary',
-              position: 'top',
-              icon: 'key-outline'
-            });
-            await toast.present();
-            return true;
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-  }
 }

@@ -1,0 +1,44 @@
+// Hide layout elements when scan starts to expose native window layer
+:host-context(body.barcode-scanner-active) {
+  ion-content {
+    --background: transparent;
+  }
+}
+
+.scanner-ui-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 40px 20px;
+  background: rgba(0, 0, 0, 0.4); // Darkened border mask around viewfinder
+
+  .viewfinder-box {
+    width: 250px;
+    height: 250px;
+    margin-top: auto;
+    margin-bottom: auto;
+    border: 4px solid #3880ff; // Highlighting color box frame
+    border-radius: 12px;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4); // Darkens area outside scanner square
+  }
+
+  .scanner-buttons {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 20px;
+    z-index: 10;
+  }
+}
+
+.scanned-text {
+  font-weight: bold;
+  word-break: break-all;
+  color: var(--ion-color-dark);
+}

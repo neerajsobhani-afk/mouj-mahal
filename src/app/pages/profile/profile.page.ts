@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { App } from '@capacitor/app';
 import {
   IonContent,
   IonIcon,
@@ -12,7 +13,8 @@ import {
   personOutline,
   logOutOutline,
   keyOutline,
-  chevronForwardOutline
+  chevronForwardOutline,
+  alertCircleOutline
 } from 'ionicons/icons';
 import { AuthService, UserData } from '../../services/auth.service';
 
@@ -35,22 +37,32 @@ export class ProfilePage implements OnInit {
 
   currentUser: UserData | null = null;
   officerName = 'User';
-
+  appVersion: any; 
   constructor() {
     addIcons({
       personOutline,
       logOutOutline,
       keyOutline,
-      chevronForwardOutline
+      chevronForwardOutline,
+      alertCircleOutline
     });
   }
 
   ngOnInit() {
+    this.checkVersion();
     this.currentUser = this.authService.getUser();
     if (this.currentUser) {
       this.officerName = this.currentUser.name || `${this.currentUser.firstName || ''} ${this.currentUser.lastName || ''}`.trim() || 'User';
     }
   }
+
+  checkVersion = async () => {
+    console.log('Checking app version...');
+    const info = await App.getInfo();
+    this.appVersion = info.version;
+    console.log('App Version:', info.version);
+    console.log('Build Number:', info.build);
+  };
 
   async onChangePassword() {
     const alert = await this.alertCtrl.create({

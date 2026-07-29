@@ -1,0 +1,39 @@
+<ion-header [class.ion-hide]="isScanning">
+  <ion-toolbar color="primary">
+    <ion-title>QR Code Scanner</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" [forceOverscroll]="false">
+  <!-- Standard Landing UI (Hidden while camera layer active) -->
+  <div class="ion-padding ion-text-center" *ngIf="!isScanning">
+    <ion-button expand="block" (click)="startScan()">
+      <ion-icon name="qr-code-outline" slot="start"></ion-icon>
+      Start Scanning
+    </ion-button>
+
+    <ion-card *ngIf="scanResult" class="ion-margin-top">
+      <ion-card-header>
+        <ion-card-title>Scan Result</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p class="scanned-text">{{ scanResult }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Native Active Camera Overlay Window -->
+  <div class="scanner-ui-container" *ngIf="isScanning">
+    <div class="viewfinder-box"></div>
+    
+    <div class="scanner-buttons">
+      <ion-fab-button (click)="toggleTorch()" color="light">
+        <ion-icon [name]="isTorchOn ? 'flash-off' : 'flash'"></ion-icon>
+      </ion-fab-button>
+      
+      <ion-fab-button (click)="stopScan()" color="danger">
+        <ion-icon name="close"></ion-icon>
+      </ion-fab-button>
+    </div>
+  </div>
+</ion-content>

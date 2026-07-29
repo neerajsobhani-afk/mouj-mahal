@@ -42,3 +42,18 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+
+// Force visibility bypass so native camera canvas can bleed through elements
+body.barcode-scanner-active {
+  --background: transparent !important;
+  background: transparent !important;
+  
+  ion-app, 
+  ion-router-outlet, 
+  mat-sidenav-container, 
+  .ion-page {
+    background: transparent !important;
+    --background: transparent !important;
+  }
+}
