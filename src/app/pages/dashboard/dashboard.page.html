@@ -7,10 +7,6 @@
         <h1 class="page-title">Officer Dashboard</h1>
         <p class="page-subtitle">Monitoring Fun Zone entry point Alpha-1</p>
       </div>
-      <button type="button" class="header-notification-btn" aria-label="Refresh Stats" (click)="loadDashboardStats()">
-        <ion-icon name="refresh-outline" *ngIf="!isLoading"></ion-icon>
-        <ion-spinner name="crescent" *ngIf="isLoading" style="width: 20px; height: 20px;"></ion-spinner>
-      </button>
     </div>
 
     <!-- Stats Section (Today's Entries Only) -->

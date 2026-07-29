@@ -3,9 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import {
   IonContent,
-  IonIcon,
-  IonSpinner,
-  ToastController
+  IonIcon
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -13,10 +11,12 @@ import {
   cameraOutline,
   checkmarkCircleOutline,
   alertCircleOutline,
+  closeCircleOutline,
   shieldCheckmarkOutline,
-  keyOutline
+  warningOutline,
+  locationOutline,
+  arrowBackOutline
 } from 'ionicons/icons';
-import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -27,19 +27,47 @@ import { AuthService } from '../../services/auth.service';
   imports: [
     CommonModule,
     IonContent,
-    IonIcon,
-    IonSpinner
+    IonIcon
   ]
 })
 export class ScanPage implements OnInit {
-  private toastCtrl = inject(ToastController);
   private router = inject(Router);
   private authService = inject(AuthService);
 
-  isScanning = false;
-  isVerifying = false;
-  lastScannedOrderId = '';
-  serviceType = '';
+  /**
+   * API Response Message Variable.
+   * Change this value manually in code or select from the top dropdown to test different pages:
+   * - 'Entry allowed.'   => Variation 1 (200 OK — Entry Allowed)
+   * - 'Invalid order.'   => Variation 2 (404 Not Found — Invalid Order)
+   * - 'Already entered.' => Variation 3 (409 Conflict — Already Scanned)
+   */
+  apiMessage: string = 'Entry allowed.';
+
+  // Response Payload Mock Data
+  allowedData = {
+    customerName: 'Alexander Sterling',
+    ticketNumber: '#SZ-992-FX01',
+    type: 'Fun Zone',
+    time: '14:45 PM',
+    gateName: 'North Gate B',
+    status: 'Active',
+    location: 'Fun Zone Entrance'
+  };
+
+  invalidData = {
+    title: 'Invalid QR Code',
+    message: 'This ticket is not found in the system.',
+    auditSyncTime: '2 minutes ago'
+  };
+
+  alreadyEnteredData = {
+    customerName: 'Marcus Holloway',
+    badgeType: 'VIP PASS',
+    ticketNumber: '#ENTRY-88291-FZ',
+    previousEntry: '14:22 PM',
+    lastSeenAt: 'North Plaza - Gate 4',
+    warningMessage: 'Potential duplicate entry attempt detected. Deny access and verify ID if necessary.'
+  };
 
   constructor() {
     addIcons({
@@ -47,115 +75,39 @@ export class ScanPage implements OnInit {
       cameraOutline,
       checkmarkCircleOutline,
       alertCircleOutline,
+      closeCircleOutline,
       shieldCheckmarkOutline,
-      keyOutline
+      warningOutline,
+      locationOutline,
+      arrowBackOutline
     });
   }
 
-  ngOnInit() {
-    this.serviceType = this.authService.getServiceType() || 'Ticket Manager';
-  }
+  ngOnInit() { }
 
-  async startScan() {
-    try {
-      // Check if native barcode scanner is supported
-      const { supported } = await BarcodeScanner.isSupported().catch(() => ({ supported: false }));
-
-      if (!supported) {
-        await this.showToast('QR Barcode scanner plugin is only supported on native mobile devices.', 'warning');
-        return;
-      }
-
-      // Request camera permissions
-      const { camera } = await BarcodeScanner.requestPermissions();
-      if (camera !== 'granted' && camera !== 'limited') {
-        await this.showToast('Camera permission is required to scan QR codes.', 'warning');
-        return;
-      }
-
-      this.isScanning = true;
-      const result = await BarcodeScanner.scan();
-      this.isScanning = false;
-
-      if (result.barcodes && result.barcodes.length > 0) {
-        const rawVal = result.barcodes[0].displayValue || result.barcodes[0].rawValue || '';
-        this.processScannedCode(rawVal);
-      } else {
-        await this.showToast('No QR code detected. Please try again.', 'warning');
-      }
-    } catch (err: any) {
-      this.isScanning = false;
-      console.warn('BarcodeScanner error:', err);
-      await this.showToast('Error initializing camera scanner.', 'danger');
+  onMessageChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    if (target) {
+      this.apiMessage = target.value;
     }
   }
 
-  private processScannedCode(scannedText: string) {
-    let orderId = scannedText.trim();
-    if (!orderId) {
-      this.showToast('Invalid QR Code: empty content.', 'danger');
-      return;
+  /**
+   * Evaluates apiMessage variable and returns page response type:
+   * 'allowed' | 'invalid' | 'already_entered'
+   */
+  get responseType(): 'allowed' | 'invalid' | 'already_entered' {
+    const msg = (this.apiMessage || '').trim().toLowerCase();
+    if (msg.includes('already') || msg.includes('409')) {
+      return 'already_entered';
     }
-
-    // Attempt to parse JSON if QR contains JSON string
-    try {
-      const parsed = JSON.parse(scannedText);
-      if (parsed && (parsed.orderId || parsed.order_id || parsed.id)) {
-        orderId = parsed.orderId || parsed.order_id || parsed.id;
-      }
-    } catch (_) {
-      // String is direct Order ID
+    if (msg.includes('invalid') || msg.includes('not found') || msg.includes('404')) {
+      return 'invalid';
     }
-
-    this.lastScannedOrderId = orderId;
-    this.verifyAndProcessOrder(orderId);
+    return 'allowed';
   }
 
-  async verifyAndProcessOrder(orderId: string) {
-    const role = (this.authService.getServiceType() || localStorage.getItem('serviceType') || '').trim();
-    const normalizedRole = role.toLowerCase();
-
-    // Check authorization: must be Parking Manager or Ticket Manager
-    const isAuthorized = normalizedRole.includes('ticket manager') ||
-      normalizedRole.includes('parking manager') ||
-      normalizedRole.includes('ticket') ||
-      normalizedRole.includes('parking') ||
-      !role; // Allow fallback if role not explicitly set
-
-    if (!isAuthorized) {
-      await this.showToast(`Not authorized! Your role "${role}" does not have access.`, 'danger');
-      return;
-    }
-
-    this.isVerifying = true;
-
-    // Call API with orderId & serviceType
-    this.authService.verifyOrder(orderId, role || 'Ticket Manager').subscribe({
-      next: async (res) => {
-        this.isVerifying = false;
-        await this.showToast(`Order "${orderId}" verified! Opening dashboard...`, 'success');
-        this.router.navigate(['/tabs/dashboard']);
-      },
-      error: async (_err) => {
-        this.isVerifying = false;
-        if (isAuthorized) {
-          await this.showToast(`Order "${orderId}" scanned! Redirecting to dashboard...`, 'success');
-          this.router.navigate(['/tabs/dashboard']);
-        } else {
-          await this.showToast('You are not authorized.', 'danger');
-        }
-      }
-    });
-  }
-
-  private async showToast(message: string, color: 'success' | 'warning' | 'danger' | 'dark') {
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: 3000,
-      position: 'top',
-      color
-    });
-    await toast.present();
+  onScanNext() {
+    this.router.navigate(['/tabs/dashboard']);
   }
 }
-
