@@ -70,6 +70,11 @@ export class AuthService {
     return this.http.post(url, { orderId, serviceType });
   }
 
+  getDashboardStats(userId: number): Observable<any> {
+    const url = `${this.baseUrl}/entry-dashboard?user_id=${userId}`;
+    return this.http.get(url);
+  }
+
   isLoggedIn(): boolean {
     return !!localStorage.getItem('currentUser');
   }
