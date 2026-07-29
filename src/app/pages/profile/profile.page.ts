@@ -12,8 +12,7 @@ import {
   personOutline,
   logOutOutline,
   keyOutline,
-  chevronForwardOutline,
-  createOutline
+  chevronForwardOutline
 } from 'ionicons/icons';
 import { AuthService, UserData } from '../../services/auth.service';
 
@@ -42,8 +41,7 @@ export class ProfilePage implements OnInit {
       personOutline,
       logOutOutline,
       keyOutline,
-      chevronForwardOutline,
-      createOutline
+      chevronForwardOutline
     });
   }
 
